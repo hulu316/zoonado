@@ -37,7 +37,7 @@ class DoubleBarrier(SequentialRecipe):
 
         yield self.create_unique_znode("worker")
 
-        owned_positions, participants = yield self.analyze_siblings()
+        _, participants = yield self.analyze_siblings()
 
         if exists:
             return

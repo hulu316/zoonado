@@ -11,7 +11,7 @@ log = logging.getLogger()
 monitor_ioloop = None
 
 
-def arguments(parser):
+def arguments(_):
     pass
 
 

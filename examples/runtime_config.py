@@ -7,7 +7,7 @@ from zoonado import exc
 log = logging.getLogger()
 
 
-def arguments(parser):
+def arguments(_):
     pass
 
 

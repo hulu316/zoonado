@@ -48,7 +48,7 @@ class RetryPolicy(object):
     @classmethod
     def n_times(cls, n):
 
-        def never_wait(timings):
+        def never_wait(_):
             return None
 
         return cls(try_limit=n, sleep_func=never_wait)
@@ -56,7 +56,7 @@ class RetryPolicy(object):
     @classmethod
     def forever(cls):
 
-        def never_wait(timings):
+        def never_wait(_):
             return None
 
         return cls(try_limit=None, sleep_func=never_wait)
