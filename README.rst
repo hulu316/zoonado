@@ -73,7 +73,7 @@ on GitHub.
 License
 ~~~~~~~
 
-Lighthouse is licensed under the terms of the Apache license (2.0).  See the
+Zoonado is licensed under the terms of the Apache license (2.0).  See the
 LICENSE_ file for more details.
 
 
