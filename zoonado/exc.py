@@ -76,7 +76,7 @@ class RolledBack(ResponseError):
     error_code = 0
 
 
-class SystemError(ResponseError):
+class ZKSystemError(ResponseError):
     error_code = -1
 
 
