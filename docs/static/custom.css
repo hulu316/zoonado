@@ -1,0 +1,64 @@
+.navbar-default {
+    background-color: #476c9b;
+}
+.navbar-default a {
+    text-decoration: none;
+}
+.navbar-default .navbar-brand {
+    color: #ffffff;
+}
+.navbar-default .navbar-brand:hover {
+    color: #d6e3f8;
+}
+.navbar-default .navbar-nav>li>a {
+    color: #ffffff;
+}
+.navbar-default .navbar-nav>li>a:hover {
+    color: #d6e3f8;
+}
+.navbar-form .form-control {
+    color: #ffffff;
+}
+.navbar-form .form-control:focus {
+    box-shadow: inset 0 -2px 0 #468c98;
+}
+.alert-info {
+    background-color: #476c9b;
+}
+.alert-info code {
+    color: #ffffff;
+    background-color: #476c9b;
+}
+.alert-warning {
+    background-color: #984447;
+}
+.alert-warning code {
+    color: #ffffff;
+    background-color: #984447;
+}
+.alert {
+    color: #ffffff;
+}
+.alert a:not(.close) {
+    color: #ffffff;
+    font-weight: italic;
+    text-decoration: underline;
+}
+.alert-warning a:not(.close) {
+    color: #ffffff;
+    font-style: italic;
+}
+a {
+    color: #476c9b;
+    font-weight: bold;
+}
+a:hover {
+    color: #476c9b;
+    text-decoration: underline;
+}
+code {
+    color: #92140c;
+}
+dt:target, .highlighted {
+    background-color: #c1b4ae;
+}

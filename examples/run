@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+import argparse
+import logging
+
+from tornado import ioloop
+from zoonado import Zoonado
+
+
+examples_list = (
+    "runtime_config",
+    "locking",
+    "shared_locking",
+    "election",
+    "allocator",
+    "barrier",
+    "double_barrier",
+    "child_watcher",
+    "data_watcher",
+    "party",
+    "transactions",
+    "lease",
+    "counter",
+)
+
+
+def get_target_module(example):
+    try:
+        return __import__(
+            ".".join(["examples", example]), fromlist=["run", "arguments"]
+        )
+    except (ImportError, AttributeError, ValueError) as e:
+        print("Error loading example '%s': %s" % (example, str(e)))
+        return None
+
+
+example_xref = {
+    name: get_target_module(name)
+    for name in examples_list
+}
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--verbose", "-v", action="count",
+    help="Verbosity level.  One for debug messages, two for protocol payloads."
+)
+parser.add_argument(
+    "--servers", default="localhost",
+    help="Comma-delimited list of zookeeper hosts."
+)
+parser.add_argument(
+    "--chroot", default=None,
+    help="Use a chroot path for the example."
+)
+
+subparsers = parser.add_subparsers(
+    title="examples", description="available examples", dest="example",
+    help="Which available example to run."
+)
+for name, module in example_xref.items():
+    if not module:
+        continue
+    subparser = subparsers.add_parser(name, help=module.__doc__)
+    module.arguments(subparser)
+
+
+def main():
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO)
+
+    if args.verbose >= 1:
+        logging.basicConfig(level=logging.DEBUG)
+        logging.getLogger("zoonado").setLevel(logging.DEBUG)
+    if args.verbose >= 2:
+        logging.getLogger("zoonado.connection.payload").setLevel(logging.DEBUG)
+
+    example = example_xref[args.example]
+
+    client = Zoonado(args.servers, chroot=args.chroot)
+
+    loop = ioloop.IOLoop.instance()
+
+    def wind_down(f):
+        try:
+            f.result()
+        finally:
+            loop.stop()
+
+    loop.add_future(example.run(client, args), wind_down)
+
+    try:
+        loop.start()
+    except KeyboardInterrupt:
+        loop.stop()
+
+if __name__ == "__main__":
+    main()
