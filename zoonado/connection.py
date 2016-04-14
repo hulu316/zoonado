@@ -158,7 +158,7 @@ class Connection(object):
             if isinstance(response, Exception):
                 f.set_exception(response)
             else:
-                f.set_result((xid, response))
+                f.set_result((zxid, response))
 
     @gen.coroutine
     def read_response(self, initial_connect=False):

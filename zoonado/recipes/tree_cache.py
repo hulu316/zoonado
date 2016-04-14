@@ -107,9 +107,9 @@ class ZNodeCache(object):
             child.stop()
 
         for added in added_children:
-            log.debug("added child %s", self.dot_path + "." + removed)
+            log.debug("added child %s", self.dot_path + "." + added)
             self.children[added] = ZNodeCache(
-                self.path + "/" + added,
+                self.path + "/" + added, self.defaults.get(added, {}),
                 self.client, self.data_watcher, self.child_watcher
             )
             ioloop.IOLoop.current.add_callback(self.children[added].start)

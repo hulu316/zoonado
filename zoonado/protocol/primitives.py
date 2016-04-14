@@ -10,7 +10,7 @@ class Primitive(object):
 
     https://github.com/apache/zookeeper/blob/trunk/src/zookeeper.jute
     """
-    format = None
+    fmt = None
 
     def __init__(self, value):
         self.value = value
@@ -22,7 +22,7 @@ class Primitive(object):
         The value is wrapped in a list, as there are some primitives that deal
         with multiple values.  Any caller of `render()` should expect a list.
         """
-        return self.format, [self.value]
+        return self.fmt, [self.value]
 
     @classmethod
     def parse(cls, buff, offset):
@@ -32,7 +32,7 @@ class Primitive(object):
         Uses the ``format`` class attribute to unpack the data from the buffer
         and determine the used up number of bytes.
         """
-        primitive_struct = struct.Struct("!" + cls.format)
+        primitive_struct = struct.Struct("!" + cls.fmt)
 
         value = primitive_struct.unpack_from(buff, offset)[0]
         offset += primitive_struct.size
@@ -74,7 +74,7 @@ class VariablePrimitive(Primitive):
           The value is expected to be string-able (wrapped in ``str()``) and is
           then encoded as UTF-8.
         """
-        size_format = self.size_primitive.format
+        size_format = self.size_primitive.fmt
 
         if self.value is None:
             return size_format, [-1]
@@ -83,9 +83,9 @@ class VariablePrimitive(Primitive):
 
         size = len(value)
 
-        format = "%s%ds" % (size_format, size)
+        fmt = "%s%ds" % (size_format, size)
 
-        return format, [size, value]
+        return fmt, [size, value]
 
     @classmethod
     def parse(cls, buff, offset):
@@ -114,42 +114,42 @@ class Bool(Primitive):
 
     Renders as an unsigned char (1 byte).
     """
-    format = "?"
+    fmt = "?"
 
 
 class Byte(Primitive):
     """
     Represents a single 8-bit byte.
     """
-    format = "b"
+    fmt = "b"
 
 
 class Int(Primitive):
     """
     Represents an 32-bit signed integer.
     """
-    format = "i"
+    fmt = "i"
 
 
 class Long(Primitive):
     """
     Represents an 64-bit signed integer.
     """
-    format = "q"
+    fmt = "q"
 
 
 class Float(Primitive):
     """
     Represents a single-precision floating poing conforming to IEEE 754.
     """
-    format = "f"
+    fmt = "f"
 
 
 class Double(Primitive):
     """
     Represents a double-precision floating poing conforming to IEEE 754.
     """
-    format = "d"
+    fmt = "d"
 
 
 class UString(VariablePrimitive):
@@ -217,7 +217,7 @@ class Vector(Primitive):
         if value is None:
             value = []
 
-        format = [Int.format]
+        fmt = [Int.fmt]
         data = [len(value)]
 
         for item_value in value:
@@ -227,10 +227,10 @@ class Vector(Primitive):
                 item = item_value
 
             item_format, item_data = item.render()
-            format.extend(item_format)
+            fmt.extend(item_format)
             data.extend(item_data)
 
-        return "".join(format), data
+        return "".join(fmt), data
 
     @classmethod
     def parse(cls, buff, offset):
@@ -243,7 +243,7 @@ class Vector(Primitive):
         count, offset = Int.parse(buff, offset)
 
         values = []
-        for i in range(count):
+        for _ in range(count):
             value, new_offset = cls.item_class.parse(buff, offset)
 
             values.append(value)

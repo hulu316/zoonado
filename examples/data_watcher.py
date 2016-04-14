@@ -33,6 +33,6 @@ def run(client, args):
 
     choices = ["foo:bar", "bwee:bwoo", "derp:hork"]
 
-    for i in range(5):
+    for _ in range(5):
         yield client.set_data(args.path, data=random.choice(choices))
         yield gen.sleep(1)

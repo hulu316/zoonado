@@ -39,7 +39,7 @@ def worker(number, client, args):
 
     yield party.join()
 
-    for i in range(10):
+    for _ in range(10):
         log.info("[WORKER #%d] Members I see: %s", number, party.members)
         yield gen.sleep(.5)
         should_leave = random.choice([False, False, True])

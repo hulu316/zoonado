@@ -29,10 +29,10 @@ class Request(Part):
         formats = []
         data = []
         if xid is not None:
-            formats.append(Int.format)
+            formats.append(Int.fmt)
             data.append(xid)
         if self.opcode:
-            formats.append(Int.format)
+            formats.append(Int.fmt)
             data.append(self.opcode)
 
         payload_format, payload_data = self.render()

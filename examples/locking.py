@@ -42,7 +42,7 @@ def work(number, client, args):
     with (yield lock.acquire()) as check:
         log.info("[WORKER #%d] Got lock!", number)
 
-        for i in range(num_iterations):
+        for _ in range(num_iterations):
             wait = random.choice([1, 2, 3])
             if not check():
                 log.warn("[WORKER #%d] lost my lock!", number)
