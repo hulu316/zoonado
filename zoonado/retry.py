@@ -77,6 +77,6 @@ class RetryPolicy(object):
     def until_elapsed(cls, timeout):
 
         def elapsed_time(timings):
-            return time.time() - timings[0]
+            return (time.time() + timeout) - timings[0]
 
         return cls(try_limit=None, sleep_func=elapsed_time)
