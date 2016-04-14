@@ -11,7 +11,7 @@ from .part import Part
 from .primitives import Int, Bool
 
 
-error_struct = struct.Struct("!" + Int.format)
+error_struct = struct.Struct("!" + Int.fmt)
 
 
 log = logging.getLogger(__name__)
@@ -45,10 +45,10 @@ class TransactionRequest(Request):
         formats = []
         data = []
         if xid is not None:
-            formats.append(Int.format)
+            formats.append(Int.fmt)
             data.append(xid)
         if self.opcode:
-            formats.append(Int.format)
+            formats.append(Int.fmt)
             data.append(self.opcode)
 
         for request in self.requests:
