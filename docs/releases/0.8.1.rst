@@ -1,0 +1,13 @@
+0.8.1
+~~~~~
+
+Bugfixes
+
+* Fixed RetryPolicy.n_times to actually limit
+* Fixed RetryPolicy.until_elapsed to honor the given timeout
+* Fixed last_zxid to store the zxid and not the xid
+
+Improvements
+
+* Minimized shadowing of builtins
+* Eliminated unused named variables
