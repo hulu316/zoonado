@@ -21,10 +21,14 @@ class SessionStateMachine(object):
 
     valid_transitions = set([
         (States.LOST, States.CONNECTED),
+        (States.LOST, States.READ_ONLY),
         (States.CONNECTED, States.SUSPENDED),
-        (States.READ_ONLY, States.CONNECTED),
         (States.CONNECTED, States.LOST),
+        (States.READ_ONLY, States.CONNECTED),
+        (States.READ_ONLY, States.SUSPENDED),
+        (States.READ_ONLY, States.LOST),
         (States.SUSPENDED, States.CONNECTED),
+        (States.SUSPENDED, States.READ_ONLY),
         (States.SUSPENDED, States.LOST),
     ])
 
