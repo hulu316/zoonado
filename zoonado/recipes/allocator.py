@@ -63,11 +63,6 @@ class Allocator(Recipe):
 
     @gen.coroutine
     def start(self):
-        self.party.client = self.client
-        self.party.watcher.client = self.client
-        self.data_watcher.client = self.client
-        self.lock.client = self.client
-
         self.active = True
 
         yield self.ensure_path()
