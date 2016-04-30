@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import struct
 import unittest
 

@@ -1,3 +1,5 @@
+import operator
+
 from .primitives import Primitive
 
 
@@ -12,13 +14,17 @@ class Part(object):
     parts = ()
 
     def __init__(self, **kwargs):
-        part_names = [item[0] for item in self.parts]
+        part_names = set([item[0] for item in self.parts])
 
         for name, value in kwargs.items():
             if name not in part_names:
                 raise ValueError("Unknown part name: '%s'" % name)
+            part_names.discard(name)
 
             setattr(self, name, value)
+
+        for name in part_names:
+            setattr(self, name, None)
 
     def render(self, parts=None):
         """
@@ -71,13 +77,13 @@ class Part(object):
         """
         `Part` instances are equal if all of their sub-parts are also equal.
         """
-        try:
-            return all([
-                getattr(self, part_name) == getattr(other, part_name)
-                for part_name, part_class in self.parts
-            ])
-        except AttributeError:
-            return False
+        return all([
+            getattr(self, part_name) == getattr(other, part_name)
+            for part_name, part_class in self.parts
+        ])
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def __str__(self):
 
@@ -96,5 +102,8 @@ class Part(object):
 
         return "%s(%s)" % (
             self.__class__.__name__,
-            ", ".join([subpart_string(part) for part in self.parts])
+            ", ".join([
+                subpart_string(part)
+                for part in sorted(self.parts, key=operator.itemgetter(0))
+            ])
         )
