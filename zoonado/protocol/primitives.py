@@ -165,8 +165,8 @@ class UString(VariablePrimitive):
     def parse_value(cls, value):
         return value.decode("utf-8")
 
-    def __unicode__(self):
-        return self.value
+    def __str__(self):
+        return str(self.value)
 
 
 class Buffer(VariablePrimitive):
@@ -252,4 +252,6 @@ class Vector(Primitive):
         return values, offset
 
     def __str__(self):
-        return "%s[%s]" % (self.item_class, ", ".join(map(str, self.value)))
+        return "%s[%s]" % (
+            self.item_class.__name__, ", ".join(map(str, self.value))
+        )
