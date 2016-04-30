@@ -1,3 +1,5 @@
+from zoonado.compat import add_metaclass
+
 from .part import Part
 
 
@@ -14,6 +16,7 @@ class ResponseMeta(type):
         return new_class
 
 
+@add_metaclass(ResponseMeta)
 class Response(Part):
     """
     Base class for all operation response classes.
@@ -21,8 +24,6 @@ class Response(Part):
     A simple class, has only an ``opcode`` attribute expected to be defined by
     subclasses, and a `deserialize()` classmethod.
     """
-    __metaclass__ = ResponseMeta
-
     opcode = None
 
     @classmethod
