@@ -50,8 +50,8 @@ class Zoonado(object):
 
         return "/" + normalized
 
-    def denormalize(self, path):
-        if self.chroot:
+    def denormalize_path(self, path):
+        if self.chroot and path.startswith(self.chroot):
             path = path[len(self.chroot):]
 
         return path
@@ -75,7 +75,9 @@ class Zoonado(object):
         response = yield self.session.send(request)
 
         if getattr(request, "path", None) and getattr(response, "stat", None):
-            self.stat_cache[self.denormalize(request.path)] = response.stat
+            self.stat_cache[
+                self.denormalize_path(request.path)
+            ] = response.stat
 
         raise gen.Return(response)
 
@@ -129,7 +131,7 @@ class Zoonado(object):
 
         response = yield self.send(request)
 
-        raise gen.Return(self.denormalize(response.path))
+        raise gen.Return(self.denormalize_path(response.path))
 
     @gen.coroutine
     def ensure_path(self, path, acl=None):
