@@ -577,3 +577,149 @@ class ClientTests(testing.AsyncTestCase):
 
         self.assertEqual(txn, Transaction.return_value)
         Transaction.assert_called_once_with(c)
+
+    @patch.object(client, "Features")
+    @testing.gen_test
+    def test_create_container_requires_feature_present(self, Features):
+        Features.return_value.containers = False
+
+        c = client.Zoonado("host1,host2,host3")
+
+        with self.assertRaises(ValueError):
+            yield c.create("/foo", container=True)
+
+    @patch.object(client, "Features")
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_create_with_stat(self, Session, Features):
+        response = Mock(path="/foo")
+
+        Session.return_value.send.return_value = self.future_value(response)
+        Features.return_value.create_with_stat = True
+
+        c = client.Zoonado("host1,host2,host3")
+
+        result = yield c.create("/foo", data="bar")
+
+        args, kwargs = c.session.send.call_args
+        request, = args
+
+        self.assertEqual(result, "/foo")
+
+        self.assertIsInstance(request, protocol.Create2Request)
+        self.assertEqual(request.data, "bar")
+        self.assertEqual(request.flags, 0)
+
+    @patch.object(client, "Features")
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_create_without_stat(self, Session, Features):
+        response = Mock(path="/foo")
+
+        Session.return_value.send.return_value = self.future_value(response)
+        Features.return_value.create_with_stat = False
+
+        c = client.Zoonado("host1,host2,host3")
+
+        result = yield c.create("/foo", data="bar")
+
+        args, kwargs = c.session.send.call_args
+        request, = args
+
+        self.assertEqual(result, "/foo")
+
+        self.assertIsInstance(request, protocol.CreateRequest)
+
+    @patch.object(client, "Features")
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_create_with_chroot(self, Session, Features):
+        response = Mock(path="/root/foo")
+
+        Session.return_value.send.return_value = self.future_value(response)
+        Features.return_value.create_with_stat = True
+
+        c = client.Zoonado("host1,host2,host3", chroot="/root/")
+
+        result = yield c.create("/foo", data="bar")
+
+        args, kwargs = c.session.send.call_args
+        request, = args
+
+        self.assertEqual(result, "/foo")
+
+    @patch.object(client, "Features")
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_ensure_path(self, Session, Features):
+        Session.return_value.send.return_value = self.future_value(None)
+        Features.return_value.create_with_stat = True
+
+        c = client.Zoonado("host1,host2,host3")
+
+        yield c.ensure_path("/foo/bar/bazz")
+
+        requests = [arg[0] for arg, _ in c.session.send.call_args_list]
+
+        self.assertIsInstance(requests[0], protocol.Create2Request)
+
+        self.assertEqual(requests[0].path, "/foo")
+        self.assertEqual(requests[1].path, "/foo/bar")
+        self.assertEqual(requests[2].path, "/foo/bar/bazz")
+
+    @patch.object(client, "Features")
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_ensure_path_is_normalized(self, Session, Features):
+        Session.return_value.send.return_value = self.future_value(None)
+
+        c = client.Zoonado("host1,host2,host3", chroot="/blee")
+
+        yield c.ensure_path("bar/bazz")
+
+        requests = [arg[0] for arg, _ in c.session.send.call_args_list]
+
+        self.assertEqual(requests[0].path, "/blee")
+        self.assertEqual(requests[1].path, "/blee/bar")
+        self.assertEqual(requests[2].path, "/blee/bar/bazz")
+
+    @patch.object(client, "Features")
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_ensure_path_existing_nodes(self, Session, Features):
+        send_results = [exc.NodeExists, exc.NodeExists, None]
+
+        def get_send_result(*args):
+            result = send_results.pop(0)
+            if isinstance(result, Exception):
+                return self.future_error(result)
+            else:
+                return self.future_value(result)
+
+        Session.return_value.send.side_effect = get_send_result
+
+        c = client.Zoonado("host1,host2,host3")
+
+        yield c.ensure_path("/foo/bar/bazz")
+
+        requests = [arg[0] for arg, _ in c.session.send.call_args_list]
+
+        self.assertEqual(requests[0].path, "/foo")
+        self.assertEqual(requests[1].path, "/foo/bar")
+        self.assertEqual(requests[2].path, "/foo/bar/bazz")
+
+    @patch.object(client, "Features")
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_ensure_path_without_stats(self, Session, Features):
+        Session.return_value.send.return_value = self.future_value(None)
+
+        c = client.Zoonado("host1,host2,host3")
+
+        yield c.ensure_path("/foo/bar/bazz")
+
+        requests = [arg[0] for arg, _ in c.session.send.call_args_list]
+
+        self.assertIsInstance(requests[0], protocol.CreateRequest)
+        self.assertIsInstance(requests[1], protocol.CreateRequest)
+        self.assertIsInstance(requests[2], protocol.CreateRequest)
