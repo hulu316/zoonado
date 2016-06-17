@@ -31,7 +31,7 @@ class SetDataRequest(Request):
     """
     opcode = 5
 
-    writes = True
+    writes_data = True
 
     parts = (
         ("path", UString),

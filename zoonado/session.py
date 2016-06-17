@@ -14,6 +14,8 @@ DEFAULT_ZOOKEEPER_PORT = 2181
 
 MAX_FIND_WAIT = 60  # in seconds
 
+HEARTBEAT_FREQUENCY = 3  # heartbeats per timeout interval
+
 
 log = logging.getLogger(__name__)
 
@@ -51,9 +53,9 @@ class Session(object):
         self.closing = False
 
     @gen.coroutine
-    def ensure_safe_state(self, write=False):
+    def ensure_safe_state(self, writing=False):
         safe_states = [States.CONNECTED]
-        if self.allow_read_only and not write:
+        if self.allow_read_only and not writing:
             safe_states.append(States.READ_ONLY)
 
         if self.state in safe_states:
@@ -91,11 +93,13 @@ class Session(object):
         old_conn = self.conn
         self.conn = conn
 
+        io_loop = ioloop.IOLoop.current()
+
         if old_conn:
-            ioloop.IOLoop.current().add_callback(old_conn.close, self.timeout)
+            io_loop.add_callback(old_conn.close, self.timeout)
 
         if conn.start_read_only:
-            ioloop.IOLoop.current().add_callback(self.find_server, False)
+            io_loop.add_callback(self.find_server, allow_read_only=False)
 
     @gen.coroutine
     def make_connection(self, host, port):
@@ -171,7 +175,7 @@ class Session(object):
         response = None
         while not response:
             yield self.retry_policy.enforce(request)
-            yield self.ensure_safe_state(write=request.writes)
+            yield self.ensure_safe_state(writing=request.writes_data)
 
             try:
                 self.xid += 1
@@ -185,7 +189,7 @@ class Session(object):
         raise gen.Return(response)
 
     def set_heartbeat(self):
-        timeout = self.timeout / 3
+        timeout = self.timeout / HEARTBEAT_FREQUENCY
 
         io_loop = ioloop.IOLoop.current()
 

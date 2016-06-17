@@ -8,7 +8,7 @@ class DeleteRequest(Request):
     """
     opcode = 2
 
-    writes = True
+    writes_data = True
 
     parts = (
         ("path", UString),

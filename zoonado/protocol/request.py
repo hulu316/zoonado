@@ -21,7 +21,7 @@ class Request(Part):
     """
     opcode = None
     special_xid = None
-    writes = False
+    writes_data = False
 
     def serialize(self, xid=None):
         buff = BytesIO()

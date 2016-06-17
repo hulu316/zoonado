@@ -10,7 +10,7 @@ class CreateRequest(Request):
     """
     opcode = 1
 
-    writes = True
+    writes_data = True
 
     EPHEMERAL_FLAG = 1 << 0
     SEQUENTIAL_FLAG = 1 << 1
