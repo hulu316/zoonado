@@ -1,7 +1,7 @@
 language: python
 envs:
   - TOXENV=py27
-  - TOXENV=py34
+  - TOXENV=py35
   - TOXENV=pypy
 before_install:
   - pip install codecov
