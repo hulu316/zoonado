@@ -2,7 +2,7 @@
 import struct
 import unittest
 
-from zoonado.protocol import primitives
+from zoonado.protocol import primitives, part
 
 
 class PrimitivesTests(unittest.TestCase):
@@ -41,6 +41,23 @@ class PrimitivesTests(unittest.TestCase):
 
         self.assertEqual(fmt, "idddd")
         self.assertEqual(values, [4, 1, 2.9, 3, 4.0])
+
+    def test_vector_rendering_of_parts(self):
+
+        class MyPart(part.Part):
+            parts = (
+                ("foo", primitives.Long),
+            )
+
+        part1 = MyPart(foo=3.3333)
+        part2 = MyPart(foo=1.2344)
+
+        v = primitives.Vector.of(MyPart)([part1, part2])
+
+        fmt, values = v.render()
+
+        self.assertEqual(fmt, "iqq")
+        self.assertEqual(values, [2, 3.3333, 1.2344])
 
     def test_empty_vector_rendering(self):
         v = primitives.Vector.of(primitives.Double)([])

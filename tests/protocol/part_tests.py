@@ -219,12 +219,12 @@ class PartTests(unittest.TestCase):
         class FakePart(part.Part):
             parts = (
                 ("first", primitives.Int),
-                ("second", primitives.UString),
+                ("second", primitives.Vector.of(primitives.UString)),
                 ("third", NestedPart),
             )
 
         p = FakePart(
-            second=u"foobar",
+            second=[u"foobar", u"bleebloo"],
             third=NestedPart(left="up", right="down"),
         )
 
@@ -232,6 +232,6 @@ class PartTests(unittest.TestCase):
             str(p),
             "FakePart(" +
             "first=None, " +
-            "second=foobar, " +
+            "second=[foobar, bleebloo], " +
             "third=NestedPart(left=up, right=down))"
         )
