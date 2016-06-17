@@ -2,7 +2,7 @@ from mock import patch, Mock
 from tornado import testing, concurrent
 
 from zoonado.protocol.acl import ACL
-from zoonado import client, protocol, exc
+from zoonado import client, protocol, exc, WatchEvent
 
 
 class ClientTests(testing.AsyncTestCase):
@@ -687,7 +687,7 @@ class ClientTests(testing.AsyncTestCase):
     @patch.object(client, "Session")
     @testing.gen_test
     def test_ensure_path_existing_nodes(self, Session, Features):
-        send_results = [exc.NodeExists, exc.NodeExists, None]
+        send_results = [exc.NodeExists(), exc.NodeExists(), None]
 
         def get_send_result(*args):
             result = send_results.pop(0)
@@ -723,3 +723,59 @@ class ClientTests(testing.AsyncTestCase):
         self.assertIsInstance(requests[0], protocol.CreateRequest)
         self.assertIsInstance(requests[1], protocol.CreateRequest)
         self.assertIsInstance(requests[2], protocol.CreateRequest)
+
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_wait_for_event_uses_session_callback_api(self, Session):
+        session = Session.return_value
+
+        c = client.Zoonado("host1,host2,host3")
+
+        wait = c.wait_for_event(WatchEvent.CREATED, "/foo/bar")
+
+        self.assertFalse(wait.done())
+
+        args, _ = session.add_watch_callback.call_args
+        added_event_type, added_path, added_callback = args
+
+        self.assertEqual(added_event_type, WatchEvent.CREATED)
+        self.assertEqual(added_path, "/foo/bar")
+
+        self.assertFalse(session.remove_watch_callback.called)
+
+        added_callback(wait)
+
+        self.assertTrue(wait.done())
+        self.assertEqual(wait.result(), None)
+
+        args, _ = session.remove_watch_callback.call_args
+        removed_event_type, removed_path, removed_callback = args
+
+        self.assertEqual(added_event_type, removed_event_type)
+        self.assertEqual(added_path, removed_path)
+        self.assertEqual(added_callback, removed_callback)
+
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_wait_for_event_handles_multiple_calls(self, Session):
+        session = Session.return_value
+
+        c = client.Zoonado("host1,host2,host3")
+
+        wait = c.wait_for_event(WatchEvent.CREATED, "/foo/bar")
+
+        self.assertFalse(wait.done())
+
+        args, _ = session.add_watch_callback.call_args
+        added_event_type, added_path, added_callback = args
+
+        self.assertEqual(added_event_type, WatchEvent.CREATED)
+        self.assertEqual(added_path, "/foo/bar")
+
+        self.assertFalse(session.remove_watch_callback.called)
+
+        added_callback(wait)
+        added_callback(wait)
+
+        self.assertTrue(wait.done())
+        self.assertEqual(wait.result(), None)
