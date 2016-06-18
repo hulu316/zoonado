@@ -67,7 +67,7 @@ class RetryPolicy(object):
         def exponential(timings):
             wait_time = base ** len(timings)
             if maximum is not None:
-                wait_time = max(maximum, wait_time)
+                wait_time = min(maximum, wait_time)
 
             return wait_time
 
@@ -77,6 +77,11 @@ class RetryPolicy(object):
     def until_elapsed(cls, timeout):
 
         def elapsed_time(timings):
-            return (time.time() + timeout) - timings[0]
+            if timings:
+                first_timing = timings[0]
+            else:
+                first_timing = time.time()
+
+            return (first_timing + timeout) - time.time()
 
         return cls(try_limit=None, sleep_func=elapsed_time)
