@@ -9,5 +9,5 @@ try:
     from .protocol import WatchEvent  # noqa
     from .protocol.acl import ACL  # noqa
     from .retry import RetryPolicy  # noqa
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
