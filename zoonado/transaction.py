@@ -59,12 +59,14 @@ class Transaction(object):
         pairs = zip(self.request.requests, response.responses)
 
         result = Result()
-        for request, response in pairs:
-            if isinstance(response, protocol.CreateResponse):
-                result.created.add(self.client.denormalize_path(response.path))
-            elif isinstance(response, protocol.SetDataResponse):
+        for request, reply in pairs:
+            if isinstance(reply, protocol.CheckVersionResponse):
+                result.checked.add(self.client.denormalize_path(request.path))
+            elif isinstance(reply, protocol.CreateResponse):
+                result.created.add(self.client.denormalize_path(request.path))
+            elif isinstance(reply, protocol.SetDataResponse):
                 result.updated.add(self.client.denormalize_path(request.path))
-            elif isinstance(response, protocol.DeleteResponse):
+            elif isinstance(reply, protocol.DeleteResponse):
                 result.deleted.add(self.client.denormalize_path(request.path))
 
         raise gen.Return(result)
