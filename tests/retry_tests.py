@@ -1,9 +1,9 @@
 import time
 
 from mock import patch, Mock
-from tornado import testing
+from tornado import testing, concurrent
 
-from zoonado import retry
+from zoonado import retry, exc
 
 
 class RetryTests(testing.AsyncTestCase):
@@ -133,3 +133,52 @@ class RetryTests(testing.AsyncTestCase):
         self.assertEqual(policy.sleep_func(timings), 2)
         self.assertEqual(policy.sleep_func(timings), 1)
         self.assertEqual(policy.sleep_func(timings), 0)
+
+    @testing.gen_test
+    def test_failed_enforcement(self):
+        policy = retry.RetryPolicy.once()
+
+        request = Mock()
+
+        yield policy.enforce(request)
+
+        with self.assertRaises(exc.FailedRetry):
+            yield policy.enforce(request)
+
+    @testing.gen_test
+    def test_timeout_failure(self):
+
+        def in_the_past(_):
+            return -1
+
+        request = Mock()
+
+        policy = retry.RetryPolicy(try_limit=3, sleep_func=in_the_past)
+
+        yield policy.enforce(request)
+
+        with self.assertRaises(exc.FailedRetry):
+            yield policy.enforce(request)
+
+    @patch.object(retry.gen, "sleep")
+    @testing.gen_test
+    def test_enforcing_wait_time_sleeps(self, mock_gen_sleep):
+        f = concurrent.Future()
+        f.set_result(None)
+
+        mock_gen_sleep.return_value = f
+
+        def in_the_future(_):
+            return 60
+
+        request = Mock()
+
+        policy = retry.RetryPolicy(try_limit=3, sleep_func=in_the_future)
+
+        yield policy.enforce(request)
+
+        self.assertFalse(mock_gen_sleep.called)
+
+        yield policy.enforce(request)
+
+        mock_gen_sleep.assert_called_once_with(60)
