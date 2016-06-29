@@ -80,10 +80,13 @@ class Result(object):
         self.updated = set()
         self.deleted = set()
 
-    def __nonzero__(self):
+    def __bool__(self):
         return sum([
             len(self.checked),
             len(self.created),
             len(self.updated),
             len(self.deleted),
         ]) > 0
+
+    def __nonzero__(self):
+        return self.__bool__()
