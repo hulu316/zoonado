@@ -47,7 +47,6 @@ class ResponseErrorMeta(type):
             cls, name, bases, attrs
         )
 
-        print("adding code %s to xref" % (new_class.error_code))
         response_error_xref[new_class.error_code] = new_class
 
         return new_class
@@ -64,7 +63,6 @@ class ResponseError(ZKError):
 class UnknownError(ResponseError):
 
     def __init__(self, error_code):
-        print(repr(error_code))
         self.error_code = error_code
 
     def __str__(self):
