@@ -30,9 +30,11 @@ class Request(Part):
 
         formats = []
         data = []
+
         if xid is not None:
             formats.append(Int.fmt)
             data.append(xid)
+
         if self.opcode:
             formats.append(Int.fmt)
             data.append(self.opcode)
