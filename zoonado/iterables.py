@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 def drain(iterable):
     """
     Helper method that empties an iterable as it is iterated over.

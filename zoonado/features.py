@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 ALL_FEATURES = {
     "create_with_stat": (3, 5, 0),
     "containers": (3, 5, 1),

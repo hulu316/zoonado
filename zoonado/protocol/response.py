@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from zoonado.compat import add_metaclass
 
 from .part import Part

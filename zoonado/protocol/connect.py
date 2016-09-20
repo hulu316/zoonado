@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from .request import Request
 from .response import Response
 from .primitives import Int, Long, Buffer, Bool
