@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import struct
 
 
@@ -198,7 +200,7 @@ class Vector(Primitive):
         Creates a new class with the ``item_class`` attribute properly set.
         """
         copy = type(
-            "VectorOf%s" % part_class.__name__,
+            str("VectorOf%s" % part_class.__name__),
             cls.__bases__, dict(cls.__dict__)
         )
         copy.item_class = part_class

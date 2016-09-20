@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from .compat import add_metaclass
 
 

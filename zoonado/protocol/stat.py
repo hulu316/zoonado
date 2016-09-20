@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from .part import Part
 from .primitives import Long, Int
 

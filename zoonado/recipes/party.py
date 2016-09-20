@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from tornado import gen, concurrent
 
 from .children_watcher import ChildrenWatcher

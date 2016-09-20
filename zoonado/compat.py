@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 def add_metaclass(metaclass):
     """
     Class decorator for creating a class with a metaclass.
