@@ -22,7 +22,7 @@ class Barrier(Recipe):
     @gen.coroutine
     def lift(self):
         try:
-            self.client.delete(self.path)
+            yield self.client.delete(self.path)
         except exc.NoNode:
             pass
 
