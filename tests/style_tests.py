@@ -2,11 +2,21 @@ import os
 
 from flake8.api import legacy as flake8
 
+try:
+    import __pypy__  # noqa
+    is_pypy = True
+except ImportError:
+    is_pypy = False
+
 
 MAX_COMPLEXITY = 11
 
 
 def test_style():
+    if is_pypy:
+        # TODO(wglass): these are incredibly slow in pypy for some reason
+        return
+
     for path in ("zoonado", "tests", "examples"):
         python_files = list(get_python_files(path))
         yield create_style_assert(path, python_files)
