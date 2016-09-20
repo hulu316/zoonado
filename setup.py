@@ -37,7 +37,7 @@ setup(
         "nose",
         "mock",
         "coverage",
-        "flake8",
+        "flake8>=3.0.0",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
