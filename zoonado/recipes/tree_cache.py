@@ -31,7 +31,7 @@ class TreeCache(Recipe):
 
         self.root = ZNodeCache(
             self.base_path, self.defaults,
-            self.client, self.data_watcher, self.children_watcher,
+            self.client, self.data_watcher, self.child_watcher,
         )
 
         yield self.ensure_path()
@@ -114,7 +114,7 @@ class ZNodeCache(object):
                 self.path + "/" + added, self.defaults.get(added, {}),
                 self.client, self.data_watcher, self.child_watcher
             )
-            ioloop.IOLoop.current.add_callback(self.children[added].start)
+            ioloop.IOLoop.current().add_callback(self.children[added].start)
 
     def data_callback(self, data):
         log.debug("New value for %s: %r", self.dot_path, data)

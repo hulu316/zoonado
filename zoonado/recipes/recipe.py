@@ -26,8 +26,8 @@ class Recipe(object):
 
     def set_client(self, client):
         self.client = client
-        for sub_recipe in self.sub_recipes:
-            getattr(self, sub_recipe).client = client
+        for sub_recipe in self.sub_recipes.keys():
+            getattr(self, sub_recipe).set_client(client)
 
     @classmethod
     def validate_dependencies(cls):

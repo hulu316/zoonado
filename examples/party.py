@@ -49,3 +49,5 @@ def worker(number, client, args):
             yield gen.sleep(1)
             log.info("[WORKER #%d] Rejoining the party", number)
             yield party.join()
+
+    yield party.leave()
