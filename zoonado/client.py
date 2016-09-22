@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import functools
 import logging
 
 from tornado import gen, concurrent
@@ -13,6 +14,17 @@ from .features import Features
 
 
 log = logging.getLogger(__name__)
+
+
+def znode_method(fn):
+
+    @functools.wraps(fn)
+    def wrapper(client, path, *args, **kwargs):
+        path = client.normalize_path(path)
+
+        return fn(client, path, *args, **kwargs)
+
+    return wrapper
 
 
 class Zoonado(object):
@@ -102,9 +114,8 @@ class Zoonado(object):
         return f
 
     @gen.coroutine
+    @znode_method
     def exists(self, path, watch=False):
-        path = self.normalize_path(path)
-
         try:
             yield self.send(protocol.ExistsRequest(path=path, watch=watch))
         except exc.NoNode:
@@ -113,6 +124,7 @@ class Zoonado(object):
         raise gen.Return(True)
 
     @gen.coroutine
+    @znode_method
     def create(
             self, path, data=None, acl=None,
             ephemeral=False, sequential=False, container=False,
@@ -120,7 +132,6 @@ class Zoonado(object):
         if container and not self.features.containers:
             raise ValueError("Cannot create container, feature unavailable.")
 
-        path = self.normalize_path(path)
         acl = acl or self.default_acl
 
         if self.features.create_with_stat:
@@ -136,9 +147,8 @@ class Zoonado(object):
         raise gen.Return(self.denormalize_path(response.path))
 
     @gen.coroutine
+    @znode_method
     def ensure_path(self, path, acl=None):
-        path = self.normalize_path(path)
-
         acl = acl or self.default_acl
 
         paths_to_make = []
@@ -169,9 +179,8 @@ class Zoonado(object):
             paths_to_make.pop(0)
 
     @gen.coroutine
+    @znode_method
     def delete(self, path, force=False):
-        path = self.normalize_path(path)
-
         if not force and path in self.stat_cache:
             version = self.stat_cache[path].version
         else:
@@ -180,17 +189,16 @@ class Zoonado(object):
         yield self.send(protocol.DeleteRequest(path=path, version=version))
 
     @gen.coroutine
+    @znode_method
     def get_data(self, path, watch=False):
-        path = self.normalize_path(path)
-
         response = yield self.send(
             protocol.GetDataRequest(path=path, watch=watch)
         )
         raise gen.Return(response.data)
 
     @gen.coroutine
+    @znode_method
     def set_data(self, path, data, force=False):
-        path = self.normalize_path(path)
 
         if not force and path in self.stat_cache:
             version = self.stat_cache[path].version
@@ -202,25 +210,22 @@ class Zoonado(object):
         )
 
     @gen.coroutine
+    @znode_method
     def get_children(self, path, watch=False):
-        path = self.normalize_path(path)
-
         response = yield self.send(
             protocol.GetChildren2Request(path=path, watch=watch)
         )
         raise gen.Return(response.children)
 
     @gen.coroutine
+    @znode_method
     def get_acl(self, path):
-        path = self.normalize_path(path)
-
         response = yield self.send(protocol.GetACLRequest(path=path))
         raise gen.Return(response.acl)
 
     @gen.coroutine
+    @znode_method
     def set_acl(self, path, acl, force=False):
-        path = self.normalize_path(path)
-
         if not force and path in self.stat_cache:
             version = self.stat_cache[path].version
         else:
