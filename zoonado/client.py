@@ -11,6 +11,7 @@ from .recipes.proxy import RecipeProxy
 from .session import Session
 from .transaction import Transaction
 from .features import Features
+from .encoding import default_encoder, default_decoder
 
 
 log = logging.getLogger(__name__)
@@ -33,6 +34,8 @@ class Zoonado(object):
             self,
             servers,
             chroot=None,
+            data_encoder=None,
+            data_decoder=None,
             session_timeout=10,
             default_acl=None,
             retry_policy=None,
@@ -42,6 +45,9 @@ class Zoonado(object):
         if chroot:
             self.chroot = self.normalize_path(chroot)
             log.info("Using chroot '%s'", self.chroot)
+
+        self.data_encoder = data_encoder or default_encoder
+        self.data_decoder = data_decoder or default_decoder
 
         self.session = Session(
             servers, session_timeout, retry_policy, allow_read_only
@@ -134,6 +140,8 @@ class Zoonado(object):
 
         acl = acl or self.default_acl
 
+        data = self.data_encoder(data)
+
         if self.features.create_with_stat:
             request_class = protocol.Create2Request
         else:
@@ -194,11 +202,14 @@ class Zoonado(object):
         response = yield self.send(
             protocol.GetDataRequest(path=path, watch=watch)
         )
-        raise gen.Return(response.data)
+        data = self.data_decoder(response.data)
+
+        raise gen.Return(data)
 
     @gen.coroutine
     @znode_method
     def set_data(self, path, data, force=False):
+        data = self.data_encoder(data)
 
         if not force and path in self.stat_cache:
             version = self.stat_cache[path].version
