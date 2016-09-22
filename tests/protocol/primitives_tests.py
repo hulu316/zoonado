@@ -163,8 +163,8 @@ class PrimitivesTests(unittest.TestCase):
 
         self.assertEqual(value, u"foobar")
 
-    def test_ustring_render_parse_handles_nonstrings(self):
-        s = primitives.UString(123)
+    def test_ustring_render_parse_handles_strings(self):
+        s = primitives.UString("bazzzz")
 
         fmt, values = s.render()
 
@@ -172,4 +172,4 @@ class PrimitivesTests(unittest.TestCase):
 
         value, _ = primitives.UString.parse(raw, 0)
 
-        self.assertEqual(value, u"123")
+        self.assertEqual(value, u"bazzzz")

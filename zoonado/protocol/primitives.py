@@ -161,14 +161,14 @@ class UString(VariablePrimitive):
     size_primitive = Int
 
     def render_value(self, value):
-        return bytes(str(value).encode("utf-8"))
+        return value.encode("utf8")
 
     @classmethod
     def parse_value(cls, value):
-        return value.decode("utf-8")
+        return value.decode("utf8")
 
     def __str__(self):
-        return str(self.value)
+        return self.value
 
 
 class Buffer(VariablePrimitive):
@@ -178,7 +178,7 @@ class Buffer(VariablePrimitive):
     size_primitive = Int
 
     def render_value(self, value):
-        return bytes(value)
+        return value
 
     @classmethod
     def parse_value(cls, value):

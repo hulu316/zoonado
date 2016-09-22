@@ -290,7 +290,7 @@ class ClientTests(testing.AsyncTestCase):
     @patch.object(client, "Session")
     @testing.gen_test
     def test_get_data(self, Session):
-        response = Mock(data=u"wooo")
+        response = Mock(data=b"wooo")
         Session.return_value.send.return_value = self.future_value(response)
 
         c = client.Zoonado("host1,host2,host3")
@@ -308,8 +308,27 @@ class ClientTests(testing.AsyncTestCase):
 
     @patch.object(client, "Session")
     @testing.gen_test
+    def test_get_data_with_raw_bytes(self, Session):
+        response = Mock(data=b"\xc0=\xc00")
+        Session.return_value.send.return_value = self.future_value(response)
+
+        c = client.Zoonado("host1,host2,host3")
+
+        result = yield c.get_data("/foo/bar")
+
+        self.assertEqual(result, b"\xc0=\xc00")
+
+        args, kwargs = c.session.send.call_args
+        request, = args
+
+        self.assertIsInstance(request, protocol.GetDataRequest)
+        self.assertEqual(request.path, "/foo/bar")
+        self.assertEqual(request.watch, False)
+
+    @patch.object(client, "Session")
+    @testing.gen_test
     def test_get_data_with_watch(self, Session):
-        response = Mock(data=u"wooo")
+        response = Mock(data=b"wooo")
         Session.return_value.send.return_value = self.future_value(response)
 
         c = client.Zoonado("host1,host2,host3")
@@ -326,7 +345,7 @@ class ClientTests(testing.AsyncTestCase):
     @patch.object(client, "Session")
     @testing.gen_test
     def test_get_data_with_chroot(self, Session):
-        response = Mock(data=u"wooo")
+        response = Mock(data=b"wooo")
         Session.return_value.send.return_value = self.future_value(response)
 
         c = client.Zoonado("host1,host2,host3", chroot="bwee")
@@ -354,8 +373,39 @@ class ClientTests(testing.AsyncTestCase):
 
         self.assertIsInstance(request, protocol.SetDataRequest)
         self.assertEqual(request.path, "/foo/bar")
-        self.assertEqual(request.data, "some data")
+        self.assertEqual(request.data, b"some data")
         self.assertEqual(request.version, -1)
+
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_set_data_with_invalid_data(self, Session):
+        Session.return_value.send.return_value = self.future_value(None)
+
+        c = client.Zoonado("host1,host2,host3")
+
+        with self.assertRaises(Exception):
+            yield c.set_data("/foo/bar", data=555)
+
+        with self.assertRaises(Exception):
+            yield c.set_data("/foo/bar", data=object())
+
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_set_data_with_string(self, Session):
+        Session.return_value.send.return_value = self.future_value(None)
+
+        c = client.Zoonado("host1,host2,host3")
+
+        yield c.set_data("/foo/bar", data="foo_bar")
+
+    @patch.object(client, "Session")
+    @testing.gen_test
+    def test_set_data_with_binary_data(self, Session):
+        Session.return_value.send.return_value = self.future_value(None)
+
+        c = client.Zoonado("host1,host2,host3")
+
+        yield c.set_data("/foo/bar", data=b"\xc0=\x00")
 
     @patch.object(client, "Session")
     @testing.gen_test
@@ -364,14 +414,14 @@ class ClientTests(testing.AsyncTestCase):
 
         c = client.Zoonado("host1,host2,host3", chroot="/bar")
 
-        yield c.set_data("/foo/bar", data=u"{json}")
+        yield c.set_data("/foo/bar", data="{json}")
 
         args, kwargs = c.session.send.call_args
         request, = args
 
         self.assertIsInstance(request, protocol.SetDataRequest)
         self.assertEqual(request.path, "/bar/foo/bar")
-        self.assertEqual(request.data, u"{json}")
+        self.assertEqual(request.data, b"{json}")
         self.assertEqual(request.version, -1)
 
     @patch.object(client, "Session")
@@ -389,7 +439,7 @@ class ClientTests(testing.AsyncTestCase):
 
         self.assertIsInstance(request, protocol.SetDataRequest)
         self.assertEqual(request.path, "/foo/bar")
-        self.assertEqual(request.data, "{json}")
+        self.assertEqual(request.data, b"{json}")
         self.assertEqual(request.version, 33)
 
     @patch.object(client, "Session")
@@ -407,7 +457,7 @@ class ClientTests(testing.AsyncTestCase):
 
         self.assertIsInstance(request, protocol.SetDataRequest)
         self.assertEqual(request.path, "/foo/bar")
-        self.assertEqual(request.data, "{blarg}")
+        self.assertEqual(request.data, b"{blarg}")
         self.assertEqual(request.version, -1)
 
     @patch.object(client, "Session")
@@ -607,7 +657,7 @@ class ClientTests(testing.AsyncTestCase):
         self.assertEqual(result, "/foo")
 
         self.assertIsInstance(request, protocol.Create2Request)
-        self.assertEqual(request.data, "bar")
+        self.assertEqual(request.data, b"bar")
         self.assertEqual(request.flags, 0)
 
     @patch.object(client, "Features")
