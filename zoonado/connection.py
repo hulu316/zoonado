@@ -53,8 +53,10 @@ class Connection(object):
         stream = yield client.connect(self.host, self.port)
 
         log.debug("Sending 'srvr' command to %s:%d", self.host, self.port)
-        yield stream.write("srvr")
+        yield stream.write(b"srvr")
         answer = yield stream.read_until_close()
+
+        answer = answer.decode("utf8")
 
         version_line = answer.split("\n")[0]
         self.version_info = tuple(
