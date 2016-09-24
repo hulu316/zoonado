@@ -1,0 +1,18 @@
+0.9.0
+~~~~~
+
+API Changes
+
+* The Zoonado class now takes optional arguments data_serializer
+  and data_deserializer, used for (de)serializing data payloads.
+
+Bugfixes
+
+* Many compatibility issues with python 3.5 fixed
+* Nested sub-recipes now have their client set correctly
+* Fixups to examples so they run more smoothly.
+
+Improvements
+
+* Test coverage up past 70%
+* Python 3.5 compatibility fixed up
