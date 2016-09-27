@@ -85,10 +85,7 @@ class ZNodeCache(object):
 
         self.data = data
         for child in children:
-            self.children[child] = ZNodeCache(
-                self.path + "/" + child, self.defaults.get(child, {}),
-                self.client, self.data_watcher, self.child_watcher
-            )
+            self.add_child_znode_cache(child)
 
         yield [child.start() for child in self.children.values()]
 
@@ -110,15 +107,18 @@ class ZNodeCache(object):
 
         for added in added_children:
             log.debug("added child %s", self.dot_path + "." + added)
-            self.children[added] = ZNodeCache(
-                self.path + "/" + added, self.defaults.get(added, {}),
-                self.client, self.data_watcher, self.child_watcher
-            )
+            self.add_child_znode_cache(added)
             ioloop.IOLoop.current().add_callback(self.children[added].start)
 
     def data_callback(self, data):
         log.debug("New value for %s: %r", self.dot_path, data)
         self.data = data
+
+    def add_child_znode_cache(self, child_name):
+        self.children[child_name] = ZNodeCache(
+            self.path + "/" + child_name, self.defaults.get(child_name, {}),
+            self.client, self.data_watcher, self.child_watcher
+        )
 
     def as_dict(self):
         if self.children:
