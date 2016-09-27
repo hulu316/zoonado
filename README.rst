@@ -4,8 +4,8 @@ Zoonado: Async Tornado Zookeeper Client
 
 .. image::
     https://img.shields.io/pypi/v/zoonado.svg
-    :target: http://pypi.python.org/pypi/zoonado
     :alt: Python Package Version
+    :target: http://pypi.python.org/pypi/zoonado
 .. image::
     https://readthedocs.org/projects/zoonado/badge/?version=latest
     :alt: Documentation Status
@@ -15,13 +15,13 @@ Zoonado: Async Tornado Zookeeper Client
     :alt: Build Status
     :target: https://travis-ci.org/wglass/zoonado
 .. image::
-    https://landscape.io/github/wglass/zoonado/master/landscape.svg?style=flat
-    :alt: Code Health
-    :target: https://landscape.io/github/wglass/zoonado/master
+    https://codeclimate.com/github/wglass/zoonado/badges/gpa.svg
+    :alt: Code Climate
+    :target: https://codeclimate.com/github/wglass/zoonado
 .. image::
-    https://codecov.io/github/wglass/zoonado/coverage.svg?branch=master
-    :alt: Codecov.io
-    :target: https://codecov.io/github/wglass/zoonado?branch=master
+    https://codeclimate.com/github/wglass/zoonado/badges/coverage.svg
+    :alt: Test Coverage
+    :target: https://codeclimate.com/github/wglass/zoonado/coverage
 
 ..
 
