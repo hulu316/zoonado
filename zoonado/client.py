@@ -189,10 +189,7 @@ class Zoonado(object):
     @gen.coroutine
     @znode_method
     def delete(self, path, force=False):
-        if not force and path in self.stat_cache:
-            version = self.stat_cache[path].version
-        else:
-            version = -1
+        version = self.determine_znode_version(path, force)
 
         yield self.send(protocol.DeleteRequest(path=path, version=version))
 
@@ -210,11 +207,7 @@ class Zoonado(object):
     @znode_method
     def set_data(self, path, data, force=False):
         data = self.data_encoder(data)
-
-        if not force and path in self.stat_cache:
-            version = self.stat_cache[path].version
-        else:
-            version = -1
+        version = self.determine_znode_version(path, force)
 
         yield self.send(
             protocol.SetDataRequest(path=path, data=data, version=version)
@@ -237,10 +230,7 @@ class Zoonado(object):
     @gen.coroutine
     @znode_method
     def set_acl(self, path, acl, force=False):
-        if not force and path in self.stat_cache:
-            version = self.stat_cache[path].version
-        else:
-            version = -1
+        version = self.determine_znode_version(path, force)
 
         yield self.send(
             protocol.SetACLRequest(path=path, acl=acl, version=version)
@@ -248,3 +238,9 @@ class Zoonado(object):
 
     def begin_transaction(self):
         return Transaction(self)
+
+    def determine_znode_version(self, path, force):
+        if not force and path in self.stat_cache:
+            return self.stat_cache[path].version
+        else:
+            return -1
