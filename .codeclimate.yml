@@ -1,0 +1,20 @@
+engines:
+  pep8:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - python
+  radon:
+    enabled: true
+    config:
+      threshold: "C"
+  fixme:
+    enabled: true
+ratings:
+  paths:
+    - "zoonado"
+exclude_paths:
+  - "tests/*"
+  - "docs/*"
