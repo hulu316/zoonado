@@ -20,7 +20,8 @@ setup(
     entry_points={
         "zoonado.recipes": [
             "data_watcher = zoonado.recipes.data_watcher:DataWatcher",
-            "children_watcher = zoonado.recipes.children_watcher:ChildrenWatcher",
+            "children_watcher" +
+            " = zoonado.recipes.children_watcher:ChildrenWatcher",
             "lock = zoonado.recipes.lock:Lock",
             "shared_lock = zoonado.recipes.shared_lock:SharedLock",
             "lease = zoonado.recipes.lease:Lease",
