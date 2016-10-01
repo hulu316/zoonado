@@ -1,9 +1,14 @@
 from __future__ import unicode_literals
 
+import logging
+
 from tornado import gen, concurrent
 
 from .children_watcher import ChildrenWatcher
 from .sequential import SequentialRecipe
+
+
+log = logging.getLogger(__name__)
 
 
 class Party(SequentialRecipe):
@@ -22,7 +27,10 @@ class Party(SequentialRecipe):
     @gen.coroutine
     def join(self):
         yield self.create_unique_znode(self.name)
-        yield self.analyze_siblings()
+
+        _, siblings = yield self.analyze_siblings()
+        self.update_members(siblings)
+
         self.watcher.add_callback(self.base_path, self.update_members)
 
     @gen.coroutine

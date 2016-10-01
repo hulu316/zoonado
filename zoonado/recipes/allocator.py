@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import collections
 import itertools
 import json
+import logging
 
 from tornado import gen, ioloop
 
@@ -10,6 +11,9 @@ from .data_watcher import DataWatcher
 from .party import Party
 from .lock import Lock
 from .recipe import Recipe
+
+
+log = logging.getLogger(__name__)
 
 
 class Allocator(Recipe):
@@ -56,6 +60,7 @@ class Allocator(Recipe):
         assert len(as_list) == len(set(as_list)), (
             "duplicate items found in allocation: %s" % self.full_allocation
         )
+
         # make sure there's no mismatch beween the full set and allocations
         assert len(self.full_set.symmetric_difference(set(as_list))) == 0, (
             "mismatch between full set and allocation: %s vs %s" % (
@@ -115,6 +120,7 @@ class Allocator(Recipe):
     def allocate(self):
         new_allocation = self.allocator_fn(self.party.members, self.full_set)
         self.validate(new_allocation)
+
         self.full_allocation = new_allocation
 
     @gen.coroutine
