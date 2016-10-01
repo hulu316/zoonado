@@ -1,0 +1,7 @@
+0.9.1
+~~~~~
+
+Bugfixes
+========
+
+* Fixes issue where the Party recipe wouldn't set its members initially.
