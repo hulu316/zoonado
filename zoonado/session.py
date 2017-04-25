@@ -204,7 +204,6 @@ class Session(object):
     def heartbeat(self):
         if self.closing:
             return
-        
         yield self.ensure_safe_state()
 
         try:
