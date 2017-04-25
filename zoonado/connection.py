@@ -216,7 +216,7 @@ class Connection(object):
 
     def drain_all_pending(self):
         for special_xid in protocol.SPECIAL_XIDS:
-            for _, f in iterables.drain(self.pending_specials[special_xid]):
+            for f in iterables.drain(self.pending_specials[special_xid]):
                 yield f
         for _, f in iterables.drain(self.pending):
             yield f
