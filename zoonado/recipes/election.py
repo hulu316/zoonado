@@ -48,7 +48,7 @@ class LeaderElection(SequentialRecipe):
             time_limit = time.time() + timeout
 
         if time_limit:
-            yield gen.with_timeout(self.leadership_future, time_limit)
+            yield gen.with_timeout(time_limit, self.leadership_future)
         else:
             yield self.leadership_future
 

@@ -37,7 +37,7 @@ class Barrier(Recipe):
         )
 
         if time_limit:
-            barrier_lifted = gen.with_timeout(barrier_lifted, time_limit)
+            barrier_lifted = gen.with_timeout(time_limit, barrier_lifted)
 
         exists = yield self.client.exists(path=self.path, watch=True)
         if not exists:
