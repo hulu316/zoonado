@@ -157,7 +157,7 @@ class Session(object):
                 yield self.establish_session()
             except exc.SessionLost:
                 self.conn.abort(exc.SessionLost)
-                yield self.conn.close()
+                yield self.conn.close(self.timeout)
                 self.session_id = None
                 self.password = b'\x00'
                 continue
