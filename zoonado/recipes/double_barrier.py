@@ -33,7 +33,7 @@ class DoubleBarrier(SequentialRecipe):
             WatchEvent.CREATED, self.sentinel_path
         )
         if time_limit:
-            barrier_lifted = gen.with_timeout(barrier_lifted, time_limit)
+            barrier_lifted = gen.with_timeout(time_limit, barrier_lifted)
 
         exists = yield self.client.exists(path=self.sentinel_path, watch=True)
 

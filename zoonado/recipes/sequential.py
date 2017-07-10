@@ -78,7 +78,7 @@ class SequentialRecipe(Recipe):
 
         unblocked = self.client.wait_for_event(WatchEvent.DELETED, path)
         if time_limit:
-            unblocked = gen.with_timeout(unblocked, time_limit)
+            unblocked = gen.with_timeout(time_limit, unblocked)
 
         exists = yield self.client.exists(path=path, watch=True)
         if not exists:

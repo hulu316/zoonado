@@ -4,7 +4,7 @@ import collections
 import logging
 import random
 
-from tornado import gen, ioloop
+from tornado import gen, ioloop, iostream
 
 from zoonado import protocol, exc
 from .connection import Connection
@@ -204,13 +204,12 @@ class Session(object):
     def heartbeat(self):
         if self.closing:
             return
-
         yield self.ensure_safe_state()
 
         try:
             zxid, _ = yield self.conn.send(protocol.PingRequest())
             self.last_zxid = zxid
-        except exc.ConnectError:
+        except (exc.ConnectError, iostream.StreamClosedError):
             self.state.transition_to(States.SUSPENDED)
         finally:
             self.set_heartbeat()
