@@ -1,0 +1,9 @@
+0.9.2
+~~~~~
+
+Bugfixes
+========
+
+* Fix arguments to a call to `connection.close(timeout)` (jleibund)
+* Fix various calls to `gen.with_timeout()` (jleibund)
+* Update Connection and Session to recover from lost connections (jleibund)
