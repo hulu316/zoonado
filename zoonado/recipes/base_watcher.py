@@ -37,15 +37,12 @@ class BaseWatcher(Recipe):
     @gen.coroutine
     def watch_loop(self, path):
         while self.callbacks[path]:
-            wait = self.client.wait_for_event(self.watched_event, path)
-
-            log.debug("Fetching data for %s", path)
             try:
                 result = yield self.fetch(path)
             except exc.NoNode:
                 return
 
-            yield wait
-
             for callback in self.callbacks[path]:
                 ioloop.IOLoop.current().add_callback(callback, result)
+
+            yield self.client.wait_for_event(self.watched_event, path)
