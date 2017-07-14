@@ -36,3 +36,5 @@ def run(client, args):
     for _ in range(5):
         yield client.set_data(args.path, data=random.choice(choices))
         yield gen.sleep(1)
+
+    yield client.delete(args.path)

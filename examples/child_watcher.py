@@ -15,7 +15,7 @@ def arguments(parser):
 
 def watcher_callback(children):
     children.sort()
-    log.info("There are %d items now: %s", len(children), children)
+    log.info("There are %d items now: %s", len(children), ", ".join(children))
 
 
 @gen.coroutine
@@ -40,3 +40,4 @@ def run(client, args):
 
     for item in to_make:
         yield client.delete(args.path + "/" + item)
+        yield gen.sleep(1)
