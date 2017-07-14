@@ -93,7 +93,12 @@ class Part(object):
             part_name, part_class = part_info
 
             if not part_class.__name__.startswith("VectorOf"):
-                return "%s=%s" % (part_name, getattr(self, part_name, None))
+                value = getattr(self, part_name, None)
+
+                if value and part_class.__name__ == "Buffer":
+                    value = value.decode("utf-8", errors="replace")
+
+                return "%s=%s" % (part_name, value)
 
             return "%s=[%s]" % (
                 part_name,
