@@ -14,7 +14,6 @@ def arguments(_):
 @gen.coroutine
 def run(client, args):
     config_path = "/exampleconfig"
-    loop = ioloop.IOLoop.current()
 
     yield client.start()
 
@@ -23,15 +22,26 @@ def run(client, args):
     yield config.start()
 
     try:
-        yield client.create(config_path + "/running", data="yes")
+        yield client.create(config_path + "/running")
     except exc.NodeExists:
-        yield client.set_data(config_path + "/running", data="yes")
+        pass
+
+    yield config.running.set_value("yes")
 
     for path in ["foo", "bar", "bazz", "bloo"]:
         try:
-            yield client.create(config_path + "/" + path, data="1")
+            yield client.create(config_path + "/" + path)
         except exc.NodeExists:
-            yield client.set_data(config_path + "/" + path, data="1")
+            pass
+
+    yield [
+        config.foo.set_value(1),
+        config.bar.set_value(2),
+        config.bazz.set_value(1),
+        config.bloo.set_value(3),
+    ]
+
+    loop = ioloop.IOLoop.current()
 
     loop.add_callback(foo, config)
     loop.add_callback(bar, config)
@@ -40,19 +50,19 @@ def run(client, args):
 
     yield gen.sleep(1)
 
-    yield client.set_data(config_path + "/foo", "3")
+    yield config.foo.set_value(3)
 
     yield gen.sleep(1)
 
-    yield client.set_data(config_path + "/bar", "2")
+    yield config.bar.set_value(2)
 
-    yield client.set_data(config_path + "/bazz", "5")
+    yield config.bazz.set_value(5)
 
     yield gen.sleep(6)
 
-    yield client.set_data(config_path + "/running", data="no")
+    yield config.running.set_value("no")
 
-    yield gen.sleep(2)
+    yield gen.sleep(6)
 
     yield client.close()
 
