@@ -11,7 +11,7 @@ from tornado import ioloop, iostream, gen, concurrent, tcpclient
 from zoonado import protocol, iterables, exc
 
 
-version_regex = re.compile(r'Zookeeper version: (\d)\.(\d)\.(\d)-.*')
+version_regex = re.compile(r'Zookeeper version: (\d+)\.(\d+)\.(\d+)-.*')
 
 # all requests and responses are prefixed with a 32-bit int denoting size
 size_struct = struct.Struct("!i")
@@ -143,6 +143,8 @@ class Connection(object):
             try:
                 xid, zxid, response = yield self.read_response()
             except iostream.StreamClosedError:
+                log.error('iostream.StreamClosedError')
+                self.abort()
                 return
             except Exception:
                 log.exception("Error reading response.")
@@ -207,7 +209,8 @@ class Connection(object):
         def abort_pending(f):
             exc_info = sys.exc_info()
             if any(exc_info):
-                f.set_exc_info(exc_info)
+                # f.set_exc_info(exc_info)
+                concurrent.future_set_exc_info(f, exc_info)
             else:
                 f.set_exception(exception(self.host, self.port))
 

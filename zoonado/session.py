@@ -14,7 +14,7 @@ from .retry import RetryPolicy
 
 DEFAULT_ZOOKEEPER_PORT = 2181
 
-MAX_FIND_WAIT = 60  # in seconds
+MAX_FIND_WAIT = 4  # in seconds
 
 HEARTBEAT_FREQUENCY = 3  # heartbeats per timeout interval
 
