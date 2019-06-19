@@ -169,8 +169,9 @@ class Session(object):
 
             self.conn.start_read_loop()
 
-            if session_was_lost:
-                yield self.set_existing_watches()
+            log.info('session_was_lost: %s' % session_was_lost)
+            #if session_was_lost:
+            yield self.set_existing_watches()
 
     @gen.coroutine
     def send(self, request):
